@@ -1,0 +1,9 @@
+# Ignore project dependencies
+/node_modules
+
+# Ignore editor/OS files
+.DS_Store
+.vscode/
+
+# Ignore build/log files
+npm-debug.lo
