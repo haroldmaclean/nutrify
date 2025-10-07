@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken')
 
 // importing models
 const userModel = require('./models/userModel')
+const foodModel = require('./models/foodModel')
+const trackingModel = require('./models/trackingModel')
+const verifyToken = require('./verifyToken')
 
 // database connection
 mongoose
@@ -67,6 +70,71 @@ app.post('/login', async (req, res) => {
   } catch (err) {
     console.log(err)
     res.status(500).send({ message: 'Some Problem' })
+  }
+})
+
+// endpoint to fetch all foods
+
+app.get('/foods', verifyToken, async (req, res) => {
+  try {
+    let foods = await foodModel.find()
+
+    res.send(foods)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({ message: 'Some Problem while getting info' })
+  }
+})
+
+// endpoint to search food by name
+
+app.get('/foods/:name', verifyToken, async (req, res) => {
+  try {
+    let foods = await foodModel.find({
+      name: { $regex: req.params.name, $options: 'i' },
+    })
+    if (foods.length !== 0) {
+      res.send(foods)
+    } else {
+      res.status(404).send({ message: 'Food Item Not Fund' })
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({ message: 'Some Problem while getting food' })
+  }
+})
+
+//endpoint to track a food
+
+app.post('/track', verifyToken, async (req, res) => {
+  let trackData = req.body
+
+  try {
+    let data = await trackingModel.create(trackData)
+    res.status(201).send({ message: 'Food added' })
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({ message: 'Some Problem while tracking food' })
+  }
+})
+
+//endpoint to fetch all foods eaten by a person
+
+app.get('/track/:userid/:date', verifyToken, async (req, res) => {
+  let userid = req.params.userid
+  let date = new Date(req.params.date)
+  let strDate =
+    date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear()
+
+  try {
+    let foods = await trackingModel
+      .find({ userId: userid, eatenDate: strDate })
+      .populate('userId')
+      .populate('foodId')
+    res.send(foods)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send({ message: 'Some Problem while getting info' })
   }
 })
 
