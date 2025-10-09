@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const cors = require('cors')
 
 // importing models
 const userModel = require('./models/userModel')
@@ -21,6 +22,7 @@ mongoose
 
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 //endpoint for register user
 
