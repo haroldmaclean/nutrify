@@ -59,7 +59,12 @@ app.post('/login', async (req, res) => {
         if (success == true) {
           jwt.sign({ email: userCred.emal }, 'nutrifyapp', (err, token) => {
             if (!err) {
-              res.send({ message: 'Login Successful', token: token })
+              res.send({
+                message: 'Login Successful',
+                token: token,
+                userid: user._id, // Added user ID
+                name: user.name, // Added user name
+              })
             }
           })
         } else {

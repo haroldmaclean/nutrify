@@ -51,3 +51,27 @@ a {
   width: 100%;
   text-align: center;
 }
+
+.success {
+  background-color: #90ee90;
+  color: green;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  opacity: 1;
+}
+.error {
+  background-color: lightcoral;
+  color: red
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  opacity: 1;
+}
+
+.invisible-msg {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  opacity: 0;
+}

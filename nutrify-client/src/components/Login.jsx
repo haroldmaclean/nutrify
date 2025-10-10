@@ -1,29 +1,91 @@
 import React from 'react'
-import { Link, Links } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Login() {
+  const navigate = useNavigate()
+
+  const [userCreds, setUserCreds] = useState({
+    email: '',
+    password: '',
+  })
+
+  const [message, setMessage] = useState({
+    type: 'invisible-msg',
+    text: 'hello User',
+  })
+
+  function handleInput(event) {
+    setUserCreds((prevState) => {
+      return {
+        ...prevState,
+        [event.target.name]: event.target.value,
+      }
+    })
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    console.log(userCreds)
+    fetch('http://localhost:8000/login', {
+      method: 'POST',
+      body: JSON.stringify(userCreds),
+      headers: {
+        'content-type': 'application/json',
+      },
+    })
+      .then((response) => {
+        if (response.status === 404) {
+          setMessage({ type: 'error', text: 'User not found' })
+        } else if (response.status === 403) {
+          setMessage({ type: 'error', text: 'Incorrect password' })
+        } else if (response.status === 200) {
+          return response.json()
+        }
+        setTimeout(() => {
+          setMessage({ type: 'invisible-msg', text: 'Hello User' })
+        })
+      }, 2000)
+      .then((data) => {
+        if (data.token !== undefined) {
+          localStorage.setItem('nutrify-user', JSON.stringify(data))
+          navigate('/track')
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
   return (
     <section className='container'>
-      <form className='form'>
+      <form className='form' onSubmit={handleSubmit}>
         <h1>login to fitness</h1>
 
         <input
           className='inp'
+          required
           type='email'
+          onChange={handleInput}
           placeholder='Enter Email'
           name='email'
+          value={userCreds.email}
         />
         <input
           className='inp'
+          required
+          maxLength={8}
           type='password'
+          onChange={handleInput}
           placeholder='Enter Password'
-          name='pasasword'
+          name='password'
+          value={userCreds.password}
         />
 
         <button className='btn'>Login</button>
         <p>
           Don't have account? <Link to='/register'>Register now</Link>
         </p>
+        <p className={message.type}>{message.text}</p>
       </form>
     </section>
   )

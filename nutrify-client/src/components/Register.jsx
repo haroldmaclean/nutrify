@@ -8,6 +8,11 @@ export default function Register() {
     age: '',
   })
 
+  const [message, setMessage] = useState({
+    type: 'invisible-msg',
+    text: 'Hello User',
+  })
+
   function handleInput(event) {
     setUserDetails((prevState) => {
       return {
@@ -21,15 +26,26 @@ export default function Register() {
     event.preventDefault()
     console.log(userDetails)
 
-    fetch('http://localhost:800/register', {
-      method: 'post',
+    fetch('http://localhost:8000/register', {
+      method: 'POST',
       body: JSON.stringify(userDetails),
       headers: {
         'content-type': 'application/json',
       },
     })
-      .then((response) => {
-        console.log(response)
+      .then((response) => response.json())
+      .then((data) => {
+        setMessage({ type: 'success', text: data.message })
+        setUserDetails({
+          name: '',
+          email: '',
+          password: '',
+          age: '',
+        })
+
+        setTimeout(() => {
+          setMessage({ type: 'invisible-msg', text: 'Hello User' })
+        }, 5000)
       })
       .catch((err) => {
         console.log(err)
@@ -82,6 +98,7 @@ export default function Register() {
         <p>
           Already Registerd? <Link to='/login'>Login</Link>
         </p>
+        <p className={message.type}>{message.text}</p>
       </form>
     </section>
   )
