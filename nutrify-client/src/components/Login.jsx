@@ -1,6 +1,6 @@
-import React from 'react'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { UserContext } from '../contexts/UserContext'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -14,6 +14,8 @@ export default function Login() {
     type: 'invisible-msg',
     text: 'hello User',
   })
+
+  const loggedInData = useContext(UserContext)
 
   function handleInput(event) {
     setUserCreds((prevState) => {
@@ -44,11 +46,13 @@ export default function Login() {
         }
         setTimeout(() => {
           setMessage({ type: 'invisible-msg', text: 'Hello User' })
-        })
-      }, 2000)
+        }, 5000)
+      })
+
       .then((data) => {
         if (data.token !== undefined) {
           localStorage.setItem('nutrify-user', JSON.stringify(data))
+          loggedInData.setLoggedUser(data)
           navigate('/track')
         }
       })
