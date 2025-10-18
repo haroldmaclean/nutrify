@@ -21,7 +21,13 @@ const trackingSchema = mongoose.Schema(
     },
     eatenDate: {
       type: String,
-      default: new Date().toLocaleDateString(),
+      // ⭐️ FIX: Define the default using a padded, consistent function
+      default: () => {
+        const now = new Date()
+        const month = String(now.getMonth() + 1).padStart(2, '0')
+        const day = String(now.getDate()).padStart(2, '0')
+        return `${month}/${day}/${now.getFullYear()}`
+      },
     },
     quantity: {
       type: Number,

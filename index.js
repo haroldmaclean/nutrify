@@ -1,14 +1,3 @@
-// const express = require('express')
-// const mongoose = require('mongoose')
-// const bcrypt = require('bcrypt')
-// const jwt = require('jsonwebtoken')
-// const cors = require('cors')
-
-// // importing models
-// const userModel = require('./models/userModel')
-// const foodModel = require('./models/foodModel')
-// const trackingModel = require('./models/trackingModel')
-// const verifyToken = require('./verifyToken')
 const express = require('express')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
@@ -218,9 +207,12 @@ app.post('/track', verifyToken, async (req, res) => {
 
 app.get('/track/:userid/:date', verifyToken, async (req, res) => {
   let userid = req.params.userid
-  let date = new Date(req.params.date)
-  let strDate =
-    date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear()
+  let dateObj = new Date(req.params.date)
+
+  // ⭐️ IMPLEMENTED STEP 2: Custom formatting to guarantee MM/DD/YYYY padded format
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+  const day = String(dateObj.getDate()).padStart(2, '0')
+  let strDate = `${month}/${day}/${dateObj.getFullYear()}` // MM/DD/YYYY format
 
   try {
     let foods = await trackingModel
