@@ -16,6 +16,8 @@ function App() {
     JSON.parse(localStorage.getItem('nutrify-user'))
   )
 
+  // NOTE: Added this comment to create a new commit and force synchronization with remote.
+
   return (
     <>
       <UserContext.Provider value={{ loggedUser, setLoggedUser }}>
