@@ -1,8 +1,9 @@
 import { useState, useContext } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { UserContext } from '../contexts/UserContext'
-
+import { Link, useNavigate } from 'react-router-dom'
 export default function Login() {
+  const loggedInData = useContext(UserContext)
+
   const navigate = useNavigate()
 
   const [userCreds, setUserCreds] = useState({
@@ -12,47 +13,45 @@ export default function Login() {
 
   const [message, setMessage] = useState({
     type: 'invisible-msg',
-    text: 'hello User',
+    text: 'Dummy Msg',
   })
-
-  const loggedInData = useContext(UserContext)
 
   function handleInput(event) {
     setUserCreds((prevState) => {
-      return {
-        ...prevState,
-        [event.target.name]: event.target.value,
-      }
+      return { ...prevState, [event.target.name]: event.target.value }
     })
   }
 
   function handleSubmit(event) {
     event.preventDefault()
     console.log(userCreds)
+
     fetch('http://localhost:8000/login', {
       method: 'POST',
       body: JSON.stringify(userCreds),
       headers: {
-        'content-type': 'application/json',
+        'Content-Type': 'application/json',
       },
     })
       .then((response) => {
         if (response.status === 404) {
-          setMessage({ type: 'error', text: 'User not found' })
+          setMessage({ type: 'error', text: 'Username or Email Doesnt Exist' })
         } else if (response.status === 403) {
-          setMessage({ type: 'error', text: 'Incorrect password' })
-        } else if (response.status === 200) {
-          return response.json()
+          setMessage({ type: 'error', text: 'Incorrect Password' })
         }
-        setTimeout(() => {
-          setMessage({ type: 'invisible-msg', text: 'Hello User' })
-        }, 5000)
-      })
 
+        setTimeout(() => {
+          setMessage({ type: 'invisible-msg', text: 'Dummy Msg' })
+        }, 5000)
+
+        return response.json()
+      })
       .then((data) => {
         if (data.token !== undefined) {
           localStorage.setItem('nutrify-user', JSON.stringify(data))
+
           loggedInData.setLoggedUser(data)
+
           navigate('/track')
         }
       })
@@ -60,10 +59,11 @@ export default function Login() {
         console.log(err)
       })
   }
+
   return (
     <section className='container'>
       <form className='form' onSubmit={handleSubmit}>
-        <h1>login to fitness</h1>
+        <h1>Login To Fitness</h1>
 
         <input
           className='inp'
@@ -74,9 +74,9 @@ export default function Login() {
           name='email'
           value={userCreds.email}
         />
+
         <input
           className='inp'
-          required
           maxLength={8}
           type='password'
           onChange={handleInput}
@@ -86,9 +86,11 @@ export default function Login() {
         />
 
         <button className='btn'>Login</button>
+
         <p>
-          Don't have account? <Link to='/register'>Register now</Link>
+          Dont Have a Account ? <Link to='/register'>Register Now</Link>
         </p>
+
         <p className={message.type}>{message.text}</p>
       </form>
     </section>

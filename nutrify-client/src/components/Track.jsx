@@ -1,25 +1,23 @@
 import { UserContext } from '../contexts/UserContext'
-import { useState, useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Food from './Food'
-
+import Header from './Header'
 export default function Track() {
   const loggedInData = useContext(UserContext)
-  const [foodItems, setFoodItems] = useState([])
-  const [food, setFood] = useState(null)
 
-  useEffect(() => {
-    console.log(food)
-  }, [food])
+  const [foodItems, setFoodItems] = useState([])
+
+  const [food, setFood] = useState(null)
 
   function searchFood(event) {
     if (event.target.value.length !== 0) {
       fetch(`http://localhost:8000/foods/${event.target.value}`, {
         method: 'GET',
-        headers: { Authorization: `Bearer ${loggedInData.loggedUser.token}` },
+        headers: {
+          Authorization: `Bearer ${loggedInData.loggedUser.token}`,
+        },
       })
-        .then((response) => {
-          return response.json()
-        })
+        .then((response) => response.json())
         .then((data) => {
           console.log(data)
           if (data.message === undefined) {
@@ -39,6 +37,8 @@ export default function Track() {
   return (
     <>
       <section className='container track-container'>
+        <Header />
+
         <div className='search'>
           <input
             className='search-inp'
@@ -46,6 +46,7 @@ export default function Track() {
             type='search'
             placeholder='Search Food Item'
           />
+
           {foodItems.length !== 0 ? (
             <div className='search-results'>
               {foodItems.map((item) => {
@@ -64,6 +65,7 @@ export default function Track() {
             </div>
           ) : null}
         </div>
+
         {food !== null ? <Food food={food} /> : null}
       </section>
     </>
