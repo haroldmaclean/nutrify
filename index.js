@@ -1,3 +1,6 @@
+// Load environment variables from .env file (for local use)
+require('dotenv').config()
+
 const express = require('express')
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
@@ -11,17 +14,19 @@ const trackingModel = require('./models/trackingModel')
 const verifyToken = require('./verifyToken')
 
 // database connection
+// Use the MONGODB_URI environment variable (Atlas URI)
 mongoose
-  .connect('mongodb://localhost:27017/nutrify')
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('Database connection successful') // ⭐️ FIX: COMMENTED OUT! The update script has run and should not run again. // updateFoodImages()
+    console.log('Database connection successful')
   })
   .catch((err) => {
-    console.log('err')
+    console.error('Database connection error:', err) // Changed console.log('err') to console.error
   })
 
 // =======================================================
 // ONE-TIME SCRIPT TO UPDATE EXISTING FOOD RECORDS (LOGIC KEPT BUT NOT CALLED)
+// NOTE: This function is defined but not called, which is correct.
 // =======================================================
 
 async function updateFoodImages() {
@@ -44,7 +49,7 @@ async function updateFoodImages() {
         name: 'Chicken Breast',
         imageUrl:
           'https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg',
-      }, // Assuming this food exists
+      },
       {
         name: 'Broccoli',
         imageUrl:
@@ -80,20 +85,19 @@ async function updateFoodImages() {
         imageUrl:
           'https://images.pexels.com/photos/3233282/pexels-photo-3233282.jpeg',
       },
-    ] // Create an array of update promises to run concurrently
+    ]
 
     const updatePromises = foodUpdates.map((food) => {
       return foodModel.updateOne(
         { name: food.name },
         { $set: { imageUrl: food.imageUrl } }
       )
-    }) // Execute all promises
+    })
 
     await Promise.all(updatePromises)
 
     console.log('Food images updated successfully using Promise.all!')
   } catch (error) {
-    // Log the error if the update fails, but let the server continue running otherwise
     console.error('Error updating food images:', error)
   }
 }
@@ -135,16 +139,21 @@ app.post('/login', async (req, res) => {
     if (user !== null) {
       bcrypt.compare(userCred.password, user.password, (err, success) => {
         if (success == true) {
-          jwt.sign({ email: userCred.emal }, 'nutrifyapp', (err, token) => {
-            if (!err) {
-              res.send({
-                message: 'Login Successful',
-                token: token,
-                userid: user._id, // Added user ID
-                name: user.name, // Added user name
-              })
+          // ⭐️ IMPORTANT: Using environment variable for JWT secret
+          jwt.sign(
+            { email: userCred.emal },
+            process.env.JWT_SECRET,
+            (err, token) => {
+              if (!err) {
+                res.send({
+                  message: 'Login Successful',
+                  token: token,
+                  userid: user._id,
+                  name: user.name,
+                })
+              }
             }
-          })
+          )
         } else {
           res.status(403).send({ message: 'Incorrect password ' })
         }
@@ -209,7 +218,7 @@ app.get('/track/:userid/:date', verifyToken, async (req, res) => {
   let userid = req.params.userid
   let dateObj = new Date(req.params.date)
 
-  // ⭐️ IMPLEMENTED STEP 2: Custom formatting to guarantee MM/DD/YYYY padded format
+  // Custom formatting to guarantee MM/DD/YYYY padded format
   const month = String(dateObj.getMonth() + 1).padStart(2, '0')
   const day = String(dateObj.getDate()).padStart(2, '0')
   let strDate = `${month}/${day}/${dateObj.getFullYear()}` // MM/DD/YYYY format
@@ -226,6 +235,9 @@ app.get('/track/:userid/:date', verifyToken, async (req, res) => {
   }
 })
 
-app.listen(8000, () => {
-  console.log('Server is up and running')
+// Use the port provided by the hosting environment (Render), or fallback to 8000 locally
+const PORT = process.env.PORT || 8000
+
+app.listen(PORT, () => {
+  console.log(`Server is up and running on port ${PORT}`)
 })

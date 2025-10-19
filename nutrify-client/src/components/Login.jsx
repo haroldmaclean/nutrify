@@ -2,6 +2,9 @@ import { useState, useContext } from 'react'
 import { UserContext } from '../contexts/UserContext'
 import { Link, useNavigate } from 'react-router-dom'
 export default function Login() {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+
   const loggedInData = useContext(UserContext)
 
   const navigate = useNavigate()
@@ -26,7 +29,7 @@ export default function Login() {
     event.preventDefault()
     console.log(userCreds)
 
-    fetch('http://localhost:8000/login', {
+    fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       body: JSON.stringify(userCreds),
       headers: {

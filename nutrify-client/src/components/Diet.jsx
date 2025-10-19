@@ -1,11 +1,14 @@
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState, useContext, useCallback } from 'react'
 import { UserContext } from '../contexts/UserContext'
 import Header from './Header' // Ensure Header component exists
 
 export default function Diet() {
+  // Define the base URL using the environment variable
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+
   const loggedInData = useContext(UserContext)
   const [items, setItems] = useState([])
-  // Initialize date to today's date to ensure first fetch is correct
   const [date, setDate] = useState(new Date())
 
   const [total, setTotal] = useState({
@@ -18,53 +21,13 @@ export default function Diet() {
 
   // Helper function to format the date correctly for the API
   const formatDate = (dateObj) => {
-    // This format (e.g., "10/17/2025") is reliably parsed by new Date()
-    // and keeps the logic consistent.
     const month = String(dateObj.getMonth() + 1).padStart(2, '0')
     const day = String(dateObj.getDate()).padStart(2, '0')
     return `${month}/${day}/${dateObj.getFullYear()}`
   }
 
-  useEffect(() => {
-    const userId = loggedInData.loggedUser.userid
-    const token = loggedInData.loggedUser.token
-
-    if (!userId || !token) return
-
-    // Use the simplified date string that the backend can now parse
-    const dateString = formatDate(date)
-
-    fetch(
-      `http://localhost:8000/track/${userId}/${encodeURIComponent(dateString)}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-      .then((response) => {
-        if (!response.ok) {
-          // If response is not OK (e.g., 404, 500), throw error
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        return response.json()
-      })
-      .then((data) => {
-        console.log('Fetched tracked items:', data)
-        setItems(data)
-      })
-      .catch((err) => {
-        console.error('Fetch error:', err)
-        setItems([]) // Clear items on error
-      })
-  }, [date, loggedInData.loggedUser.userid, loggedInData.loggedUser.token])
-
-  useEffect(() => {
-    calculateTotal()
-  }, [items])
-
-  function calculateTotal() {
+  // ⭐️ FIX 1: Wrap calculateTotal in useCallback
+  const calculateTotal = useCallback(() => {
     let totalCopy = {
       totalCaloreis: 0,
       totalProtein: 0,
@@ -74,7 +37,6 @@ export default function Diet() {
     }
 
     items.forEach((item) => {
-      // Ensure data exists before summing (Mongoose population check)
       if (item.details) {
         totalCopy.totalCaloreis += item.details.calories
         totalCopy.totalProtein += item.details.protein
@@ -85,17 +47,56 @@ export default function Diet() {
     })
 
     setTotal(totalCopy)
-  }
+  }, [items, setTotal]) // Dependency includes items state and the setter function
+
+  useEffect(() => {
+    const userId = loggedInData.loggedUser.userid
+    const token = loggedInData.loggedUser.token
+
+    if (!userId || !token) return
+
+    const dateString = formatDate(date)
+
+    // Using the dynamic API_BASE_URL variable
+    fetch(`${API_BASE_URL}/track/${userId}/${encodeURIComponent(dateString)}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        return response.json()
+      })
+      .then((data) => {
+        console.log('Fetched tracked items:', data)
+        setItems(data)
+      })
+      .catch((err) => {
+        console.error('Fetch error:', err)
+        setItems([])
+      })
+  }, [
+    date,
+    loggedInData.loggedUser.userid,
+    loggedInData.loggedUser.token,
+    API_BASE_URL, // Dependency added to fix earlier warning
+  ])
+
+  // ⭐️ FIX 2: Update the dependency array to depend on the stable calculateTotal function
+  useEffect(() => {
+    calculateTotal()
+  }, [calculateTotal])
 
   return (
     <section className='container diet-container'>
       <Header />
 
-      {/* Input is now a controlled component with the date state */}
       <input
         type='date'
         onChange={(event) => {
-          // Setting date state triggers the useEffect fetch
           setDate(new Date(event.target.value))
         }}
       />
@@ -105,7 +106,6 @@ export default function Diet() {
         <p>No food tracked on {formatDate(date)}.</p>
       ) : (
         items.map((item) => {
-          // 🛑 DANGER AREA: This relies on Mongoose Population (item.foodId must be an object)
           const foodName =
             item.foodId && item.foodId.name ? item.foodId.name : 'Unknown Food'
 

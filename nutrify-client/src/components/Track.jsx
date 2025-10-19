@@ -3,6 +3,8 @@ import { useContext, useEffect, useState } from 'react'
 import Food from './Food'
 import Header from './Header'
 export default function Track() {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
   const loggedInData = useContext(UserContext)
 
   const [foodItems, setFoodItems] = useState([])
@@ -11,7 +13,7 @@ export default function Track() {
 
   function searchFood(event) {
     if (event.target.value.length !== 0) {
-      fetch(`http://localhost:8000/foods/${event.target.value}`, {
+      fetch(`API_BASE_URL/foods/${event.target.value}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${loggedInData.loggedUser.token}`,

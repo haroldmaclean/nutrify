@@ -3,6 +3,8 @@ import { UserContext } from '../contexts/UserContext'
 import { useContext } from 'react'
 
 export default function Food(props) {
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
   const [eatenQuantity, setEatenQuantity] = useState(100)
   const [food, setFood] = useState({})
   const [foodInitial, setFoodInital] = useState({})
@@ -48,7 +50,7 @@ export default function Food(props) {
 
     console.log(trackedItem)
 
-    fetch('http://localhost:8000/track', {
+    fetch(`${API_BASE_URL}/track`, {
       method: 'POST',
       body: JSON.stringify(trackedItem),
       headers: {

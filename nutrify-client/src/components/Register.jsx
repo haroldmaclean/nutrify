@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+
 export default function Register() {
+  // 1. Define the base URL using the environment variable
+  const API_BASE_URL =
+    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+
   const [userDetails, setUserDetails] = useState({
     name: '',
     email: '',
@@ -26,7 +31,8 @@ export default function Register() {
     event.preventDefault()
     console.log(userDetails)
 
-    fetch('http://localhost:8000/register', {
+    // 2. Use the dynamic base URL for the fetch call
+    fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       body: JSON.stringify(userDetails),
       headers: {

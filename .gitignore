@@ -1,9 +1,47 @@
-# Ignore project dependencies
+# 1. DEPENDENCIES
+###################
 /node_modules
+/nutrify-client/node_modules
 
-# Ignore editor/OS files
+# 2. ENVIRONMENT FILES (SECRETS)
+################################
+# Ignore the backend .env file in the root directory
+.env
+
+# Ignore the frontend .env.local files wherever they appear
+.env.local
+/nutrify-client/.env.local
+# Or, for maximum coverage:
+**/.env.local
+
+# 3. BUILD & DISTRIBUTION FILES
+###############################
+/dist
+/dist-ssr
+/build
+/nutrify-client/build
+/nutrify-client/dist
+/nutrify-client/dist-ssr
+
+# 4. LOGS AND DEBUG
+###################
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs
+*.log
+
+# 5. OS/EDITOR FILES
+####################
 .DS_Store
 .vscode/
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# Ignore build/log files
-npm-debug.lo
+# Database Dumps (DO NOT COMMIT SECURE DATA!)
+dump/
