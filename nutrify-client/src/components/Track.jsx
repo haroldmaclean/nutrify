@@ -4,7 +4,7 @@ import Food from './Food'
 import Header from './Header'
 export default function Track() {
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+    import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8000'
   const loggedInData = useContext(UserContext)
 
   const [foodItems, setFoodItems] = useState([])

@@ -5,7 +5,7 @@ import Header from './Header' // Ensure Header component exists
 export default function Diet() {
   // Define the base URL using the environment variable
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+    import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8000'
 
   const loggedInData = useContext(UserContext)
   const [items, setItems] = useState([])

@@ -3,7 +3,7 @@ import { UserContext } from '../contexts/UserContext'
 import { Link, useNavigate } from 'react-router-dom'
 export default function Login() {
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+    import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8000'
 
   const loggedInData = useContext(UserContext)
 

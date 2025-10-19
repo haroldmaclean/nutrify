@@ -4,7 +4,7 @@ import { useContext } from 'react'
 
 export default function Food(props) {
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+    import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8000'
   const [eatenQuantity, setEatenQuantity] = useState(100)
   const [food, setFood] = useState({})
   const [foodInitial, setFoodInital] = useState({})

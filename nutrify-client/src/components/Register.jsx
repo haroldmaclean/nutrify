@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 export default function Register() {
   // 1. Define the base URL using the environment variable
   const API_BASE_URL =
-    process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'
+    import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:8000'
 
   const [userDetails, setUserDetails] = useState({
     name: '',
