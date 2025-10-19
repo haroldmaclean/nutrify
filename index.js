@@ -104,22 +104,18 @@ async function updateFoodImages() {
 
 const app = express()
 app.use(express.json())
-// Define the specific origins (frontends) that are allowed to access this API
+
 const allowedOrigins = [
-  // 1. For local development
   'http://localhost:3000',
   'http://localhost:8000',
-  // 2. For your live Vercel frontend (Production Domain)
+
   'https://nutrify-nu.vercel.app',
 ]
 
-// Configure CORS to allow only the origins above
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, or same-origin)
     if (!origin) return callback(null, true)
 
-    // Check if the requesting origin is in the allowed list
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg =
         'The CORS policy for this site does not allow access from the specified Origin.'
@@ -127,13 +123,11 @@ const corsOptions = {
     }
     return callback(null, true)
   },
-  credentials: true, // IMPORTANT: Allows cookies, authorization headers, etc.
+  credentials: true,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 }
 
-// Apply the configured CORS middleware
 app.use(cors(corsOptions))
-// =========================
 
 //endpoint for register user
 
