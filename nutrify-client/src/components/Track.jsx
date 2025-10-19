@@ -13,7 +13,7 @@ export default function Track() {
 
   function searchFood(event) {
     if (event.target.value.length !== 0) {
-      fetch(`API_BASE_URL/foods/${event.target.value}`, {
+      fetch(`${API_BASE_URL}/foods/${event.target.value}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${loggedInData.loggedUser.token}`,
