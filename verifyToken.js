@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken')
 function verifyToken(req, res, next) {
   if (req.headers.authorization !== undefined) {
     let token = req.headers.authorization.split(' ')[1]
-    jwt.verify(token, 'nutrifyapp', (err, data) => {
+    // ✅ FIX: Use the environment variable for verification
+    jwt.verify(token, process.env.JWT_SECRET, (err, data) => {
       if (!err) {
         next()
       } else {
@@ -11,7 +12,7 @@ function verifyToken(req, res, next) {
       }
     })
   } else {
-    res.send({ message: 'Please send a token' })
+    res.status(401).send({ message: 'Please send a token' }) // Changed to 401 for better security practice
   }
 }
 
